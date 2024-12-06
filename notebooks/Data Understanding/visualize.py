@@ -5,7 +5,7 @@ import seaborn as sns
 class Visualize:
     def __init__(self, log_path):
         self.log_df = pd.read_csv(log_path)
-        self.log_df['datetime'] = pd.to_datetime(self.log_df['datetime'], format='%d/%b/%Y:%H:%M:%S +0000')
+        self.log_df['datetime'] = pd.to_datetime(self.log_df['datetime'], errors='coerce') 
         self.log_df['hour'] = self.log_df['datetime'].dt.hour
     
     def plot_errors_over_time(self):
