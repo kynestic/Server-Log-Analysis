@@ -50,13 +50,41 @@ class Visualize:
         plt.xticks(range(24))
         plt.grid(True)
         plt.show()
+    
+    def plot_log_level(self):
+        """
+        Vẽ biểu đồ thanh thể hiện phân bố log level (INFO, WARNING, ERROR, CRITICAL, DEBUG).
+        """
+        def classify_log_level(status):
+            if 200 <= status <= 299:
+                return "INFO"
+            elif 300 <= status <= 399:
+                return "WARNING"
+            elif 400 <= status <= 499:
+                return "ERROR"
+            elif 500 <= status <= 599:
+                return "CRITICAL"
+            else:
+                return "DEBUG"
+        
+        self.log_df['log_level'] = self.log_df['status'].apply(classify_log_level)
+        log_level_counts = self.log_df['log_level'].value_counts()
 
+        print("Số lượng log từng loại:")
+        for level, count in log_level_counts.items():
+            print(f"  {level}: {count}")
+
+        plt.figure(figsize=(10, 6))
+        sns.barplot(x=log_level_counts.index, y=log_level_counts.values, palette="viridis")
+        plt.title("Phân bố Log Level")
+        plt.xlabel("Log Level")
+        plt.ylabel("Số lượng")
+        plt.grid(axis="y")
+        plt.show()
 
 # if __name__ == "__main__":
 #     path = r'D:\CODING\Project\Server Log Analysis\data\interim\parsed_logs.csv'
 
 #     visualizer = Visualize(path)
 
-#     visualizer.plot_errors_over_time()
-#     visualizer.plot_request_distribution()
-#     visualizer.plot_bytes_sent_per_hour()
+#     visualizer.plot_log_level()
