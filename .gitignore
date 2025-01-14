@@ -2,7 +2,8 @@
 venv
 
 # Data
-
+*.csv
+*.txt
 
 # Mac OS-specific storage files
 .DS_Store
