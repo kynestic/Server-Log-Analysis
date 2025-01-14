@@ -1,0 +1,8 @@
+traces-apm*: transactions, spans, 
+thời gian bắt đầu/kết thúc của từng transaction, trace path
+metrics-apm*: traces, logs, metrics, request data, trạng thái dịch vụ (online/offline), thông tin Agent/Server
+logs-apm*: Trả log dạng INFO, 
+WARN, ERROR, Stacktrace, mã lỗi, nguyên nhân
+metrics-apm*: CPU, RAM, Latency, 
+Tỷ lệ lỗi, Thời gian response, Số lượng request
+

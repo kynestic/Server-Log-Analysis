@@ -26,8 +26,11 @@ class LogTransform:
 
         with open(self.source_path, 'r') as file:
             log_lines = file.readlines()
-            parsed_logs = [re.match(self.log_pattern, line).groupdict()
-                           for line in log_lines if re.match(self.log_pattern, line)]
+            parsed_logs = [
+                re.match(self.log_pattern, line).groupdict()
+                for line in log_lines if re.match(self.log_pattern, line)
+            ]
+        print(f"Parsed {len(parsed_logs)} log entries.")
         return pd.DataFrame(parsed_logs)
 
     def transform(self, parsed_logs):
@@ -38,13 +41,10 @@ class LogTransform:
         :return: Preprocessed DataFrame
         """
         df = parsed_logs
-        # Data preprocessing
-        df['std'] = df['std'].replace({'stdout': 0, 'stderr': 1})
         df['datetime'] = df['datetime'].apply(lambda x: datetime.strptime(x, "%d/%b/%Y:%H:%M:%S %z"))
-        df = df.drop(['remote_user', 'header'], axis=1)
         df['method'] = df['method'].replace({'GET': 0, 'POST': 1})
-        df['bytes_sent'] = pd.to_numeric(df['bytes_sent'])
-        df['status'] = pd.to_numeric(df['status'])
+        df['bytes_sent'] = pd.to_numeric(df['bytes_sent'], errors='coerce')
+        df['status'] = pd.to_numeric(df['status'], errors='coerce')
         df['day'] = df['datetime'].dt.day
         df['hour'] = df['datetime'].dt.hour
         df['month'] = df['datetime'].dt.month
