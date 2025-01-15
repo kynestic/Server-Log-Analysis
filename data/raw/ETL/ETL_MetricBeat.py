@@ -90,7 +90,7 @@ class ExtractMetricBeatLogs:
             query_time = current_time.isoformat(timespec="milliseconds").replace("+00:00", "")+"Z"
             try:
                 # response = requests.get(self.url, headers=self.__headers, json=self.__data(query_time), verify=False, timeout=15)
-                with open('D:\Job\Viettel\Intern\ETL\ETL\logs\metricbeat-.json', 'r') as f:
+                with open('logs\metricbeat-.json', 'r') as f:
                     response = json.load(f)
                 
                 if self.process_response(response):
@@ -123,14 +123,23 @@ class Transform():
             cpu_user = cpu_info.get("user", {}).get("pct", "N/A")
             cpu_system = cpu_info.get("system", {}).get("pct", "N/A")
             cpu_iowait = cpu_info.get("iowait", {}).get("pct", "N/A")
+
+            cpu_irq = cpu_info.get("irq", {}).get("pct", "N/A")
+            cpu_softirq = cpu_info.get("softirq", {}).get("pct", "N/A")
+            cpu_steal = cpu_info.get("steal", {}).get("pct", "N/A")
+            cpu_nice = cpu_info.get("nice", {}).get("pct", "N/A")
+            cpu_idle = cpu_info.get("idle", {}).get("pct", "N/A")
+            timestamp = log_source.get("@timestamp")
             logline = {
-                "timestamp": timestamp,
-                "env": env,
-                "host_name": host_name,
                 "cpu_total": cpu_total,
                 "cpu_user": cpu_user,
                 "cpu_system": cpu_system,
-                "cpu_iowait": cpu_iowait
+                "cpu_iowait": cpu_iowait,
+                "cpu_irq ":cpu_irq,
+                "cpu_softirq":cpu_softirq,
+                "cpu_steal":cpu_steal,
+                "cpu_nice":cpu_nice,
+                "cpu_idle":cpu_idle
             }
             # logline = (
             #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | CPU: "
@@ -139,68 +148,69 @@ class Transform():
             return logline
         
         # Extract RAM
-        elif metricset == "memory":
-            memory_info = log_source.get("system", {}).get("memory", {})
-            total_memory = memory_info.get("total", 0) / (1024**3)  #GB
-            used_memory = memory_info.get("used", {}).get("pct", 0) * 100
-            free_memory = memory_info.get("free", 0) / (1024**3)
-            cached_memory = memory_info.get("cached", 0) / (1024**3)
-            logline = {
-                "timestamp": timestamp,
-                "env": env,
-                "host_name": host_name,
-                "total_memory": total_memory,
-                "used_memory": used_memory,
-                "free_memory": free_memory,
-                "cached_memory": cached_memory
-            }
-            # logline = (
-            #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | MEMORY: "
-            #     f"Total: {total_memory:.2f} GB, Used: {used_memory:.2f}%, Free: {free_memory:.2f} GB, Cached: {cached_memory:.2f} GB"
-            # )
-            return logline
+        # elif metricset == "memory":
+        #     memory_info = log_source.get("system", {}).get("memory", {})
+        #     total_memory = memory_info.get("total", 0) / (1024**3)  #GB
+        #     used_memory = memory_info.get("used", {}).get("pct", 0) * 100
+        #     free_memory = memory_info.get("free", 0) / (1024**3)
+        #     cached_memory = memory_info.get("cached", 0) / (1024**3)
+        #     logline = {
+        #         "timestamp": timestamp,
+        #         "env": env,
+        #         "host_name": host_name,
+        #         "total_memory": total_memory,
+        #         "used_memory": used_memory,
+        #         "free_memory": free_memory,
+        #         "cached_memory": cached_memory
+        #     }
+        #     # logline = (
+        #     #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | MEMORY: "
+        #     #     f"Total: {total_memory:.2f} GB, Used: {used_memory:.2f}%, Free: {free_memory:.2f} GB, Cached: {cached_memory:.2f} GB"
+        #     # )
+        #     return logline
         
-        # Extract system load
-        elif metricset == "load":
-            load_info = log_source.get("system", {}).get("load", {})
-            cores = load_info.get("cores", "N/A")
-            load_1 = load_info.get("1", "N/A")
-            load_5 = load_info.get("5", "N/A")
-            load_15 = load_info.get("15", "N/A")
-            logline = {
-                "timestamp": timestamp,
-                "env": env,
-                "host_name": host_name,
-                "cores": cores,
-                "load_1": load_1,
-                "load_5": load_5,
-                "load_15": load_15
-            }
-            # logline = (
-            #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | LOAD: "
-            #     f"1min: {load_1:.2f}, 5min: {load_5:.2f}, 15min: {load_15:.2f}, Cores: {cores}"
-            # )
-            return logline
+        # # Extract system load
+        # elif metricset == "load":
+            
+        #     load_info = log_source.get("system", {}).get("load", {})
+        #     cores = load_info.get("cores", "N/A")
+        #     load_1 = load_info.get("1", "N/A")
+        #     load_5 = load_info.get("5", "N/A")
+        #     load_15 = load_info.get("15", "N/A")
+        #     logline = {
+        #         "timestamp": timestamp,
+        #         "env": env,
+        #         "host_name": host_name,
+        #         "cores": cores,
+        #         "load_1": load_1,
+        #         "load_5": load_5,
+        #         "load_15": load_15
+        #     }
+        #     # logline = (
+        #     #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | LOAD: "
+        #     #     f"1min: {load_1:.2f}, 5min: {load_5:.2f}, 15min: {load_15:.2f}, Cores: {cores}"
+        #     # )
+        #     return logline
         
-        # Extract Networks
-        elif metricset == "network":
-            network_info = log_source.get("system", {}).get("network", {})
-            interface_name = network_info.get("name", "N/A")
-            in_bytes = network_info.get("in", {}).get("bytes", 0) / (1024**2) #BYTES
-            out_bytes = network_info.get("out", {}).get("bytes", 0) / (1024**2)
-            logline = {
-                "timestamp": timestamp,
-                "env": env,
-                "host_name": host_name,
-                "interface_name": interface_name,
-                "in_bytes": in_bytes,
-                "out_bytes": out_bytes
-            }
-            # logline = (
-            #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | NETWORK ({interface_name}): "
-            #     f"IN: {in_bytes:.2f} MB, OUT: {out_bytes:.2f} MB"
-            # )
-            return logline
+        # # Extract Networks
+        # elif metricset == "network":
+        #     network_info = log_source.get("system", {}).get("network", {})
+        #     interface_name = network_info.get("name", "N/A")
+        #     in_bytes = network_info.get("in", {}).get("bytes", 0) / (1024**2) #BYTES
+        #     out_bytes = network_info.get("out", {}).get("bytes", 0) / (1024**2)
+        #     logline = {
+        #         "timestamp": timestamp,
+        #         "env": env,
+        #         "host_name": host_name,
+        #         "interface_name": interface_name,
+        #         "in_bytes": in_bytes,
+        #         "out_bytes": out_bytes
+        #     }
+        #     # logline = (
+        #     #     f"[{timestamp}] ENV: {env} | HOST: {host_name} | NETWORK ({interface_name}): "
+        #     #     f"IN: {in_bytes:.2f} MB, OUT: {out_bytes:.2f} MB"
+        #     # )
+        #     return logline
         else:
             return {}
 
@@ -286,7 +296,7 @@ def run_etl(
 if __name__ == "__main__":
     
     time_collect = [
-        ["2024-12-23T00:00:00.000Z","2024-12-23T00:00:10.000Z"],
+        ["2025-01-02T00:00:00.000Z","2025-01-03T00:00:00.000Z"],
         # ["2024-12-23T00:00:00.000Z","2024-12-24T00:00:00.000Z"],
         # ["2024-12-24T00:00:00.000Z","2024-12-25T00:00:00.000Z"]
     ]

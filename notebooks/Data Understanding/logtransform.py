@@ -6,8 +6,8 @@ from datetime import datetime
 class LogTransform:
     def __init__(self, source_path):
         """
-        Initialize the LogTransform with source paths.
-
+        Khởi tạo hàm LogTransform với path của file nguồn
+        File nguồn là dạng text bao gồm các dòng log của server
         :param source_path: Path to the raw log file
         
         """
@@ -17,9 +17,9 @@ class LogTransform:
     def read_log_file(self, regex_exp):
         """
         Read and parse the log file based on the defined pattern.
-
-        :param regex_exp: Regex expression of logs
-        :return: List of parsed log entries as dictionaries
+        Đọc và tách các trường thông tin từ file nguồn
+        :param regex_exp: Regex expression của logs
+        :return: trả về danh sách các log dạng dict
         """
         # Define the log pattern for parsing
         self.log_pattern = regex_exp

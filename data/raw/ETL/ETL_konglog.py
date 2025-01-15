@@ -83,7 +83,7 @@ class ExtractKongLogs:
             query_time = current_time.isoformat(timespec="milliseconds").replace("+00:00", "")+"Z"
             try:
                 # response = requests.get(self.url, headers=self.__headers, json=self.__data(query_time), verify=False, timeout=15)
-                with open('D:\Job\Viettel\Intern\ETL\ETL\logs\kong-access-.json', 'r') as f:
+                with open('logs\kong-access-.json', 'r') as f:
                     response = json.load(f)
                 if self.process_response(response):
                     log, length, miss_count = self.process_response(response)
@@ -182,10 +182,9 @@ def run_etl(
     
 if __name__ == "__main__":
     time_collect = [
-        ["2024-12-22T00:00:00.000Z","2024-12-22T00:00:10.000Z"],
-        # ["2024-12-22T00:00:00.000Z","2024-12-23T00:00:00.000Z"],
-        # ["2024-12-23T00:00:00.000Z","2024-12-24T00:00:00.000Z"],
-        # ["2024-12-24T00:00:00.000Z","2024-12-25T00:00:00.000Z"]
+        ["2024-12-22T00:00:00.000Z","2024-12-23T00:00:00.000Z"],
+        ["2024-12-23T00:00:00.000Z","2024-12-24T00:00:00.000Z"],
+        ["2024-12-24T00:00:00.000Z","2024-12-25T00:00:00.000Z"]
     ]
     for time in time_collect:
         run_etl(
